@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1406732957 source:/home/tony/Documents/Program/2048-display/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+

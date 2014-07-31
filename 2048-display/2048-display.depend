@@ -5,3 +5,10 @@
 	<string.h>
 	<time.h>
 
+1406782211 source:/home/tony/Documents/Program/2048/2048-display/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<math.h>
+

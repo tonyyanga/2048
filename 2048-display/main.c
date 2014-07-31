@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 void game();
 int command(char *choices[]);
@@ -79,19 +80,27 @@ void showstatus(int* status)    //display the current status
 {
     int i;
     int j;
-    char display[4];
+    int result;
+    char display[4]="    ";
     for(i=0;i<=15;i++)
     {
         if (i%4==0)
         {
-            printf("#####################\n#    #    #    #\n#    #    #    #\n");
+            printf("#####################\n#    #    #    #    #\n#    #    #    #    #\n");
             printf("#");
         }
-        sprintf(display,"%i",*(status++));
-        printf("%4s#",display);
+        result=(int)pow(2,*(status++));
+        for(j=0;j<3-(int)log10(result);j++)
+        {
+            printf(" ");
+        }
+        if (result!=1)
+            printf("%i#",result);
+        else
+            printf(" #");
         if (i%4==3)
         {
-            printf("\n#    #    #    #\n");
+            printf("\n#    #    #    #    #\n");
         }
         if (i==15) printf("#####################\n");
     }
@@ -113,12 +122,12 @@ void initiate(int* status)
         if(count==i)
         {
             *status=1;
-            if(rand()>0.9) (*status)++;
+            if((rand()%10)==9) (*status)++;
         }
         else if(count==j)
             {
                 *status=1;
-                if(rand()>0.9) (*status)++;
+                if((rand()%10)==9) (*status)++;
             }
             else *status=0;
             status++;

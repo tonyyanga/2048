@@ -208,6 +208,32 @@ void move(int* origin, int side, long* score)    //calculate one move
             }
             break;
 	    }
+	    case 3:
+	    {
+	        for(i=0;i<=15;i++)
+            {
+                convert[3-(int)(i/4)+i%4*4]=*(origin+i);
+            }
+            upmove(convert,score);
+            for(i=0;i<=15;i++)
+            {
+            *(status+(int)(i/4)+(3-i%4)*4)=convert[i];
+            }
+            break;
+	    }
+	    case 4:
+	    {
+	        for(i=0;i<=15;i++)
+            {
+                convert[(int)(i/4)+(3-i%4)*4]=*(origin+i);
+            }
+            upmove(convert,score);
+            for(i=0;i<=15;i++)
+            {
+            *(status+3-(int)(i/4)+i%4*4)=convert[i];
+            }
+            break;
+	    }
 	}
 }
 

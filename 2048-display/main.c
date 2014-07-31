@@ -12,6 +12,7 @@ int command(char *choices[], int display);
 void move(int* origin, int side, long* score);
 void showstatus(int* origin,long score);
 void initiate(int* origin);
+void upmove(int* origin, long* score);
 
 char *menu[] = {"a - new game", "q - quit", NULL,};
 char *direction[] = {"w","a","s","d",NULL};
@@ -87,10 +88,26 @@ void game() //main game function
         choice=command(direction,FALSE);
         switch (choice)
         {
-            case 'w':move(status,1,&score);
-            case 'a':move(status,3,&score);
-            case 's':move(status,2,&score);
-            case 'd':move(status,4,&score);
+            case 'w':
+            {
+                move(status,1,&score);
+                break;
+            }
+            case 'a':
+            {
+                move(status,3,&score);
+                break;
+            }
+            case 's':
+            {
+                move(status,2,&score);
+                break;
+            }
+            case 'd':
+            {
+                move(status,4,&score);
+                break;
+            }
             case 'q':break;
         }
         for(i=0;i<=15;i++)
@@ -167,16 +184,42 @@ void initiate(int* origin)
 void move(int* origin, int side, long* score)    //calculate one move
 //side: 1=up;2=down;3=left;4=right
 {
-	int i=0;
+	int* status;
+	int convert[16];
+    status=origin;
+    int i;
+	switch(side)
+	{
+	    case 1:
+	    {
+	        upmove(status, score);
+	        break;
+	    }
+	    case 2:
+	    {
+	        for(i=0;i<=15;i++)
+            {
+                convert[12-4*((int)(i/4))+i%4]=*(origin+i);
+            }
+            upmove(convert,score);
+            for(i=0;i<=15;i++)
+            {
+            *(status+12-4*((int)(i/4))+i%4)=convert[i];
+            }
+            break;
+	    }
+	}
+}
+
+void upmove(int* origin, long* score)
+{
+    int i=0;
 	int j=0;
 	int* status;
 	int blank=0;
 	status=origin;
-	switch (side)
-	{
-		case 1:
-			{
-				for(i=0;i<=3;i++)
+	//THE FOLLOWING REQUIRES CORRECTION.
+	for(i=0;i<=3;i++)
 				{
 				    j=0;
 				    do
@@ -211,6 +254,4 @@ void move(int* origin, int side, long* score)    //calculate one move
 				        }else blank--;
 				    }
 				}
-            }
-	}
 }

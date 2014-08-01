@@ -13,6 +13,13 @@ void move(int* origin, int side, long* score);
 void showstatus(int* origin,long score);
 void initiate(int* origin);
 void upmove(int* origin, long* score);
+struct intchain* fall(int* numlist, long*score, int* move);
+
+struct intchain
+{
+    int value;
+    struct intchain* point;
+};
 
 char *menu[] = {"a - new game", "q - quit", NULL,};
 char *direction[] = {"w","a","s","d",NULL};
@@ -184,6 +191,7 @@ void initiate(int* origin)
 void move(int* origin, int side, long* score)    //calculate one move
 //side: 1=up;2=down;3=left;4=right
 {
+
 	int* status;
 	int convert[16];
     status=origin;
@@ -237,37 +245,40 @@ void move(int* origin, int side, long* score)    //calculate one move
 	}
 }
 
+
+
 void upmove(int* origin, long* score)
 {
+
+    int moved=0;
     int i=0;
 	int j=0;
 	int* status;
 	int blank=0;
+	int row[4];
+    struct intchain* list;
+	struct intchain* next;
 	status=origin;
 	//THE FOLLOWING REQUIRES CORRECTION.
 	for(i=0;i<=3;i++)
 				{
-				    j=0;
-				    do
+                    row[0]=*(status+i);
+                    row[1]=*(status+i+4);
+                    row[2]=*(status+i+8);
+                    row[3]=*(status+i+12);
+                    list=fall(row,score, &moved);
+                    next=list;
+                    for (j=0;j<=3;j++)
                     {
-                        if(*(status+4*(3-j)+i)!=0)
-                        {
-                            if (*(status+4*(2-j)+i)==0)
-                            {
-                                *(status+4*(2-j)+i)=*(status+4*(3-j)+i);
-                                *(status+4*(3-j)+i)=0;
-                                j++;
-                            }else if (*(status+4*(2-j)+i)==*(status+4*(3-j)+i))
-                                {
-                                    *(status+4*(2-j)+i)+=1;
-                                    *score+=*(status+4*(2-j)+i);
-                                    *(status+4*(3-j)+i)=0;
-                                    break;
-                                }else j++;
-                        }else j++;
-                    }while(j<=2);
+                        *(status+i+4*j)=list->value;
+                        next=list->point;
+                        free(list);
+                        list=next;
+                    }
 				}
 				blank=(*(status+12)==0)+(*(status+13)==0)+(*(status+14)==0)+(*(status+15)==0);
+        if (moved)
+        {
 				for(i=12;i<=15;i++)
 				{
 				    if (*(status+i)==0)
@@ -280,4 +291,93 @@ void upmove(int* origin, long* score)
 				        }else blank--;
 				    }
 				}
+        }
+}
+struct intchain* fall(int* numlist,long* score, int* move)
+{
+    int i=0;
+    int* list=numlist;
+    struct intchain* Head=NULL;
+    struct intchain* End, *New;
+    Head=End=New=(struct intchain*)malloc(sizeof(struct intchain));
+    while(i<=1)
+    {
+        i++;
+        New=(struct intchain*)malloc(sizeof(struct intchain));
+        End->point=New;
+        End->value=*(list++);
+        End=New;
+    }
+    End->value=*(list++);
+    New=(struct intchain*)malloc(sizeof(struct intchain));
+    End->point=New;
+    New->value=*list;
+    New->point=NULL;
+    End=Head;
+    do
+    {
+        if (End->value==0)
+        {
+            if (End==Head)
+            {
+                New=Head;
+                Head=Head->point;
+                free(New);
+                End=Head;
+            }
+            else
+            {
+                New->point=End->point;
+                free(End);
+                End=New;
+                if(New->point)
+                    if ((New->point)->value!=0)
+                        (*move)+=1;
+            }
+        }
+        New=End;
+        if (End)
+            if (End!=Head||Head->value!=0) End=End->point;
+    }while(End);
+    if(Head)
+    {
+        End=Head;
+        while(End->point)
+        {
+            if (End->value==(End->point)->value&&End->value!=0)
+            {
+                End->value++;
+                (*move)+=1;
+                *score+=(int)pow(2,End->value);
+                New=End->point;
+                End->point=New->point;
+                free(New);
+            }else End=End->point;
+        }
+    }
+    End=Head;
+    New=Head;
+    for (i=0;i<=3;i++)
+    {
+        if (!End)
+        {
+            End=(struct intchain*)malloc(sizeof(struct intchain));
+            if (!Head)
+            {
+                Head=End;
+                New=Head;
+            }
+            else New->point=End;
+            End->value=0;
+            End->point=NULL;
+
+        }
+        New=End;
+        End=End->point;
+    }
+
+    End=Head;
+    if (Head->value!=*numlist)
+        (*move)+=1;
+    return Head;
 }
